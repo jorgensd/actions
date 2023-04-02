@@ -1,0 +1,77 @@
+  name: Install DOLFINx
+  description: Install DOLFINx from source
+
+  inputs:
+    dolfinx:
+      description: 'Branch of DOLFINx'
+      required: false
+      default: 'main'
+    ufl:
+      description: 'Branch of UFL'
+      required: false
+      default: 'main'
+    ffcx:
+      description: 'Branch of FFCx'
+      required: false
+      default: 'main'
+    basix:
+      description: 'Branch of Basix'
+      required: false
+      default: 'main'
+    petsc_dir:
+      description: 'PETSc Directory'
+      required: false
+      default: '/usr/local/petsc'
+    petsc_arch:
+      description: 'PETSc Arch'
+      required: false
+      default: 'linux-gnu-real-32'
+    build_mode:
+      description: "Mode to build Basix and DOLFINx"
+      required: false
+      default: "Release"
+
+  runs:
+    using: composite
+
+
+    steps:
+      - name: Get Basix
+        uses: actions/checkout@v3
+        with:
+          path: ./basix
+          repository: FEniCS/basix
+          ref: ${{ inputs.basix }}
+
+      - name: Get DOLFINx
+        uses: actions/checkout@v3
+        with:
+          path: ./dolfinx
+          repository: FEniCS/dolfinx
+          ref: ${{ inputs.dolfinx }}
+
+      - name: Install UFL, Basix, FFCx
+        shell: bash -el {0}
+        run: |
+          cmake -G Ninja -B build-basix -DCMAKE_BUILD_TYPE="Release" -S ./basix/cpp/
+          cmake --build build-basix --parallel 2
+          cmake --install build-basix
+          BUILD_TYPE=${{ inputs.build_mode }} python3 -m pip install ./basix/python
+          python3 -m pip install git+https://github.com/FEniCS/ufl.git@${{ inputs.ufl }}
+          python3 -m pip install git+https://github.com/FEniCS/ffcx.git@${{ inputs.ffcx }}
+
+
+      - name: Configure C++ (DOLFINx)
+        shell: bash -el {0}
+        run:
+          PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ inputs.build_mode }} -B build-dolfinx -S ./dolfinx/cpp/
+
+      - name: Build and install C++ library (dolfinx)
+        shell: bash -el {0}
+        run: |
+          cmake --build build-dolfinx
+          cmake --install build-dolfinx
+
+      - name: Build Python interface (DOLFINx)
+        shell: bash -el {0}
+        run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} BUILD_TYPE=${{ inputs.build_mode }} python3 -m pip -v install ./dolfinx/python/
