@@ -53,6 +53,10 @@ runs:
         repository: FEniCS/dolfinx
         ref: ${{ inputs.dolfinx }}
 
+    - name: Install pybind11
+      shell: bash -el {0}
+      run: python3 -m pip install pybind11
+
     - name: Install UFL, Basix, FFCx
       shell: bash -el {0}
       run: |
