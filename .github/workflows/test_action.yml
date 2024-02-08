@@ -62,9 +62,9 @@ jobs:
     env:
       working-directory: ./test_directory
       OMPI_ALLOW_RUN_AS_ROOT: 1
-      ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-      ENV OMPI_MCA_plm: ssh
-      ENV OMPI_MCA_plm_ssh_agent: false
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+      OMPI_MCA_plm: ssh
+      OMPI_MCA_plm_ssh_agent: false
 
     steps:
       - uses: actions/checkout@v4
