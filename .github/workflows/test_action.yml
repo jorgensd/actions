@@ -78,8 +78,7 @@ jobs:
         uses: ./install-dolfinx
         with:
           dolfinx: ${{ matrix.branch }}
-          ufl      - name: Make working directory
-          run: mkdir -p  ${{ env.working-directory }}: ${{ matrix.branch }}
+          ufl: ${{ matrix.branch }}
           ffcx: ${{ matrix.branch }}
           basix: ${{ matrix.branch }}
           build_mode: ${{ matrix.build_mode }}
