@@ -20,6 +20,8 @@ jobs:
   test-mpich:
     runs-on: "ubuntu-latest"
     container: ghcr.io/fenics/test-env:current-mpich
+    env:
+      working-directory: ./test_directory
     strategy:
       matrix:
         branch: [main, release]
@@ -28,6 +30,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Make working directory
+        run: mkdir -p  ${{ env.working-directory }}
 
       - uses: ./install-dolfinx
         with:
@@ -39,9 +44,11 @@ jobs:
           petsc_arch: ${{ matrix.petsc_arch }}
 
       - name: Check if DOLFINx runs
+        working-directory: ${{ env.working-directory }}
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if DOLFINx runs in parallel
+        working-directory: ${{ env.working-directory }}
         run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
 
   test-openmpi:
@@ -62,7 +69,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./install-dolfinx
+      - name: Make working directory
+        run: mkdir -p  ${{ env.working-directory }}
+
+      - name: Install DOLFINx
+        uses: ./install-dolfinx
         with:
           dolfinx: ${{ matrix.branch }}
           ufl: ${{ matrix.branch }}
