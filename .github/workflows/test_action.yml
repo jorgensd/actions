@@ -19,7 +19,7 @@ on:
 jobs:
   test-mpich:
     runs-on: "ubuntu-latest"
-    container: ghcr.io/fenics/dolfinx/test-env:current-mpich
+    container: ghcr.io/fenics/test-env:current-mpich
     strategy:
       matrix:
         branch: [main, release]
@@ -43,7 +43,7 @@ jobs:
 
   test-openmpi:
     runs-on: "ubuntu-latest"
-    container: ghcr.io/fenics/dolfinx/test-env:current-openmpi
+    container: ghcr.io/fenics/test-env:current-openmpi
     strategy:
       matrix:
         branch: [main, release]
