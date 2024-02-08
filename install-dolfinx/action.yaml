@@ -64,7 +64,7 @@ runs:
         python3 -m pip install git+https://github.com/FEniCS/ffcx.git@${{ inputs.ffcx }}
 
     - name: Install adios2
-      if: ${{ inputs.adios2 }} != "default"
+      if: ${{ inputs.adios2 != "default" }}
       shell: bash -el {0}
       run: |
         git clone --branch=${{ inputs.adios2 }} --single-branch https://github.com/ornladios/ADIOS2.git
