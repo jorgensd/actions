@@ -32,9 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Make working directory
-        run: mkdir -p  ${{ env.working-directory }}
-
       - uses: ./install-dolfinx
         with:
           dolfinx: ${{ matrix.branch }}
@@ -44,6 +41,10 @@ jobs:
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
           adios2: ${{ matrix.adios2}}
+
+
+      - name: Make working directory
+        run: mkdir -p  ${{ env.working-directory }}
 
       - name: Check if DOLFINx runs
         working-directory: ${{ env.working-directory }}
@@ -73,19 +74,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Make working directory
-        run: mkdir -p  ${{ env.working-directory }}
-
       - name: Install DOLFINx
         uses: ./install-dolfinx
         with:
           dolfinx: ${{ matrix.branch }}
-          ufl: ${{ matrix.branch }}
+          ufl      - name: Make working directory
+          run: mkdir -p  ${{ env.working-directory }}: ${{ matrix.branch }}
           ffcx: ${{ matrix.branch }}
           basix: ${{ matrix.branch }}
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
           adios2: ${{ matrix.adios2}}
+
+      - name: Make working directory
+        run: mkdir -p  ${{ env.working-directory }}
 
       - name: Check if DOLFINx runs
         working-directory: ${{ env.working-directory }}
