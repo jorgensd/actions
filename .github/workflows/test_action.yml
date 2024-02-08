@@ -41,6 +41,9 @@ jobs:
       - name: Check if DOLFINx runs
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
 
+      - name: Check if DOLFINx runs in parallel
+        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
+
   test-openmpi:
     runs-on: "ubuntu-latest"
     container: ghcr.io/fenics/test-env:current-openmpi
@@ -49,6 +52,11 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
+    env:
+      OMPI_ALLOW_RUN_AS_ROOT: 1
+      ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+      ENV OMPI_MCA_plm: ssh
+      ENV OMPI_MCA_plm_ssh_agent: false
 
     steps:
       - uses: actions/checkout@v4
@@ -64,3 +72,6 @@ jobs:
 
       - name: Check if DOLFINx runs
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
+
+      - name: Check if DOLFINx runs in parallel
+        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
