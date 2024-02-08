@@ -1,0 +1,42 @@
+name: Test install-dolfinx action
+
+on:
+  push:
+    # The CI is executed on every push on every branch
+    branches:
+      - "**"
+  pull_request:
+    # The CI is executed on every pull request to the main branch
+    branches:
+      - main
+
+  workflow_call:
+  workflow_dispatch:
+  schedule:
+    # The CI is executed every day at 8am
+    - cron: "0 8 * * *"
+
+jobs:
+  test-code:
+    runs-on: "ubuntu-latest"
+    container: ghcr.io/fenics/dolfinx/test-env:current
+    strategy:
+      matrix:
+        branch: [main, release]
+        petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
+        build_mode: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./install-dolfinx
+        with:
+          dolfinx: ${{ matrix.branch }}
+          ufl: ${{ matrix.branch }}
+          ffcx: ${{ matrix.branch }}
+          basix: ${{ matrix.branch }}
+          build_mode: ${{ matrix.build_mode }}
+          petsc_arch: ${{ matrix.petsc_arch }}
+
+      - name: Check if DOLFINx runs
+        run: python3 -c "import dolfinx; print(dolfinx.__version__)"
