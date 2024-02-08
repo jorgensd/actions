@@ -27,6 +27,7 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
+        adios2: [default, v2.10.0-rc1]
 
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +43,7 @@ jobs:
           basix: ${{ matrix.branch }}
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
+          adios2: ${{ matrix.adios2}}
 
       - name: Check if DOLFINx runs
         working-directory: ${{ env.working-directory }}
@@ -59,6 +61,8 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
+        adios2: [default, v2.10.0-rc1]
+
     env:
       working-directory: ./test_directory
       OMPI_ALLOW_RUN_AS_ROOT: 1
@@ -81,6 +85,7 @@ jobs:
           basix: ${{ matrix.branch }}
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
+          adios2: ${{ matrix.adios2}}
 
       - name: Check if DOLFINx runs
         working-directory: ${{ env.working-directory }}
