@@ -27,7 +27,7 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.0-rc1]
+        adios2: [default, v2.10.0]
 
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.0-rc1]
+        adios2: [default, v2.10.0]
 
     env:
       working-directory: ./src
@@ -101,7 +101,7 @@ jobs:
         petsc_arch: [""]
         petsc_dir: ["/usr/local"]
         build_mode: [Release, Debug]
-        adios2: [v2.10.0-rc1]
+        adios2: [v2.10.0]
 
     steps:
       - uses: actions/checkout@v4
@@ -124,4 +124,4 @@ jobs:
         run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if ADIOS2 is present
-        run: python3 -c "import adios2; print(adios2.__version__)"
+        run: python3 -c "import adios2; print(adios2.__version__); import adios2.bindings"
