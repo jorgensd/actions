@@ -85,7 +85,7 @@ jobs:
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if DOLFINx runs in parallel
-        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)
+        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if ADIOS2 is present
         run: python3 -c "import adios2; print(adios2.__version__)"
