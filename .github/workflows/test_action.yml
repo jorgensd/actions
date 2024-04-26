@@ -21,7 +21,7 @@ jobs:
     runs-on: "ubuntu-latest"
     container: ghcr.io/fenics/test-env:current-mpich
     env:
-      working-directory: ./test_directory
+      working-directory: /src
     strategy:
       matrix:
         branch: [main, release]
@@ -41,17 +41,12 @@ jobs:
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
           adios2: ${{ matrix.adios2}}
-
-
-      - name: Make working directory
-        run: mkdir -p  ${{ env.working-directory }}
+          working-directory: ${{ env.working-directory }}
 
       - name: Check if DOLFINx runs
-        working-directory: ${{ env.working-directory }}
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if DOLFINx runs in parallel
-        working-directory: ${{ env.working-directory }}
         run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
 
   test-openmpi:
@@ -84,14 +79,49 @@ jobs:
           build_mode: ${{ matrix.build_mode }}
           petsc_arch: ${{ matrix.petsc_arch }}
           adios2: ${{ matrix.adios2}}
-
-      - name: Make working directory
-        run: mkdir -p  ${{ env.working-directory }}
+          working-directory: ${{ env.working-directory }}
 
       - name: Check if DOLFINx runs
-        working-directory: ${{ env.working-directory }}
         run: python3 -c "import dolfinx; print(dolfinx.__version__)"
 
       - name: Check if DOLFINx runs in parallel
-        working-directory: ${{ env.working-directory }}
+        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)
+
+      - name: Check if ADIOS2 is present
+        run: python3 -c "import adios2; print(adios2.__version__)"
+
+  test-redhat:
+    runs-on: "ubuntu-latest"
+    container: ghcr.io/fenics/test-env:current-redhat
+    env:
+      working-directory: /src
+    strategy:
+      matrix:
+        branch: [main, release]
+        petsc_arch: [""]
+        petsc_dir: ["/usr/local"]
+        build_mode: [Release, Debug]
+        adios2: [default, v2.10.0-rc1]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./install-dolfinx
+        with:
+          dolfinx: ${{ matrix.branch }}
+          ufl: ${{ matrix.branch }}
+          ffcx: ${{ matrix.branch }}
+          basix: ${{ matrix.branch }}
+          build_mode: ${{ matrix.build_mode }}
+          petsc_arch: ${{ matrix.petsc_arch }}
+          adios2: ${{ matrix.adios2}}
+          working-directory: ${{ env.working-directory }}
+
+      - name: Check if DOLFINx runs
+        run: python3 -c "import dolfinx; print(dolfinx.__version__)"
+
+      - name: Check if DOLFINx runs in parallel
         run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
+
+      - name: Check if ADIOS2 is present
+        run: python3 -c "import adios2; print(adios2.__version__)"
