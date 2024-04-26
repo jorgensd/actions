@@ -34,6 +34,10 @@ inputs:
     description: "ADIOS2 version/branch"
     required: false
     default: "default"
+  working-directory:
+    description: "Working directory"
+    required: false
+    default: "."
 
 runs:
   using: composite
@@ -42,14 +46,14 @@ runs:
     - name: Get Basix
       uses: actions/checkout@v4
       with:
-        path: ./basix
+        path: ${{ inputs.working-directory }}/basix
         repository: FEniCS/basix
         ref: ${{ inputs.basix }}
 
     - name: Get DOLFINx
       uses: actions/checkout@v4
       with:
-        path: ./dolfinx
+        path: ${{ inputs.working-directory }}/dolfinx
         repository: FEniCS/dolfinx
         ref: ${{ inputs.dolfinx }}
 
@@ -58,6 +62,7 @@ runs:
       run: python3 -m pip install pybind11
 
     - name: Install UFL, Basix, FFCx
+      working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
       run: |
         cmake -G Ninja -B build-basix -DCMAKE_BUILD_TYPE="Release" -S ./basix/cpp/
@@ -69,26 +74,28 @@ runs:
 
     - name: Install adios2
       if: ${{ inputs.adios2 != 'default' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
       run: |
         git clone --branch=${{ inputs.adios2 }} --single-branch https://github.com/ornladios/ADIOS2.git adios2
-        cmake -G Ninja -DADIOS2_USE_HDF5=on -DCMAKE_INSTALL_PYTHONDIR=/usr/local/lib/ -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -B build-dir-adios2 -S ./adios2
+        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -B build-dir-adios2 -S ./adios2
         cmake -G Ninja -B build-dir-adios2 -DCMAKE_BUILD_TYPE="Release" -S ./adios2/
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
 
     - name: Configure C++ (DOLFINx)
+      working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
       run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ inputs.build_mode }} -B build-dolfinx -S ./dolfinx/cpp/
 
     - name: Build and install C++ library (dolfinx)
       shell: bash -el {0}
+      working-directory: ${{ inputs.working-directory }}
       run: |
         cmake --build build-dolfinx
         cmake --install build-dolfinx
 
     - name: Build Python interface (DOLFINx)
+      working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
       run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install --check-build-dependencies --no-build-isolation  ./dolfinx/python/
-
-      # run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install --check-build-dependencies --config-settings=build-dir="build-dolfinx-python" --config-settings=cmake.build-type=${{ inputs.build_mode }}  --config-settings=install.strip=false --no-build-isolation -e  ./dolfinx/python/
