@@ -21,7 +21,7 @@ jobs:
     runs-on: "ubuntu-latest"
     container: ghcr.io/fenics/test-env:current-mpich
     env:
-      working-directory: /src
+      working-directory: ./src
     strategy:
       matrix:
         branch: [main, release]
@@ -60,7 +60,7 @@ jobs:
         adios2: [default, v2.10.0-rc1]
 
     env:
-      working-directory: ./test_directory
+      working-directory: ./src
       OMPI_ALLOW_RUN_AS_ROOT: 1
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
       OMPI_MCA_plm: ssh
@@ -94,7 +94,7 @@ jobs:
     runs-on: "ubuntu-latest"
     container: docker.io/fenicsproject/test-env:current-redhat
     env:
-      working-directory: /src
+      working-directory: ./src
     strategy:
       matrix:
         branch: [main, release]
