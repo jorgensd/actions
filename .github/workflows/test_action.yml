@@ -92,7 +92,7 @@ jobs:
 
   test-redhat:
     runs-on: "ubuntu-latest"
-    container: ghcr.io/fenics/test-env:current-redhat
+    container: docker.io/fenicsproject/test-env:current-redhat
     env:
       working-directory: /src
     strategy:
