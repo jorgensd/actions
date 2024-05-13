@@ -2,33 +2,37 @@ name: Test install-dolfinx action
 
 on:
   push:
-    # The CI is executed on every push on every branch
     branches:
-      - "**"
+      - main
   pull_request:
-    # The CI is executed on every pull request to the main branch
     branches:
       - main
 
   workflow_call:
   workflow_dispatch:
   schedule:
-    # The CI is executed every day at 8am
     - cron: "0 8 * * *"
 
 jobs:
-  test-mpich:
+  test-installation:
     runs-on: "ubuntu-latest"
-    container: ghcr.io/fenics/test-env:current-mpich
     env:
       working-directory: ./src
+      OMPI_ALLOW_RUN_AS_ROOT: 1
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+      OMPI_MCA_plm: ssh
+      OMPI_MCA_plm_ssh_agent: false
+      PRTE_MCA_rmaps_default_mapping_policy: :oversubscribe
+
     strategy:
       matrix:
+        mpi: ["openmpi", "mpich"]
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
         adios2: [default, v2.10.0]
 
+    container: "ghcr.io/fenics/test-env:current-${{ matrix.mpi }}"
     steps:
       - uses: actions/checkout@v4
 
@@ -48,47 +52,6 @@ jobs:
 
       - name: Check if DOLFINx runs in parallel
         run: mpirun -n 4 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
-
-  test-openmpi:
-    runs-on: "ubuntu-latest"
-    container: ghcr.io/fenics/test-env:current-openmpi
-    strategy:
-      matrix:
-        branch: [main, release]
-        petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
-        build_mode: [Release, Debug]
-        adios2: [default, v2.10.0]
-
-    env:
-      working-directory: ./src
-      OMPI_ALLOW_RUN_AS_ROOT: 1
-      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-      OMPI_MCA_plm: ssh
-      OMPI_MCA_plm_ssh_agent: false
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install DOLFINx
-        uses: ./install-dolfinx
-        with:
-          dolfinx: ${{ matrix.branch }}
-          ufl: ${{ matrix.branch }}
-          ffcx: ${{ matrix.branch }}
-          basix: ${{ matrix.branch }}
-          build_mode: ${{ matrix.build_mode }}
-          petsc_arch: ${{ matrix.petsc_arch }}
-          adios2: ${{ matrix.adios2}}
-          working-directory: ${{ env.working-directory }}
-
-      - name: Check if DOLFINx runs
-        run: python3 -c "import dolfinx; print(dolfinx.__version__)"
-
-      - name: Check if DOLFINx runs in parallel
-        run: mpirun -n 2 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
-
-      - name: Check if ADIOS2 is present
-        run: python3 -c "import adios2; print(adios2.__version__)"
 
   test-redhat:
     runs-on: "ubuntu-latest"
