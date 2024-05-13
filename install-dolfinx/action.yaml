@@ -66,6 +66,7 @@ runs:
           FLAGS="--break-system-packages  --check-build-dependencies"
         else
           FLAGS=""
+          python3 -m pip install --upgrade pip
         fi
         echo "PYTHON_FLAGS=${FLAGS}" >> "$GITHUB_OUTPUT"
 
