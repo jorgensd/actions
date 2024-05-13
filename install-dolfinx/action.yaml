@@ -62,8 +62,7 @@ runs:
       shell: bash -el {0}
       run: |
         PVERSION=$(python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)")
-        if [${PVERSION} == "3.11"] or [$PVERSION == "3.12"]
-        then
+        if [ ${PVERSION} == "3.11" ] or [ $PVERSION == "3.12" ]; then
           FLAGS="--break-system-packages"
         else
           FLAGS=""
