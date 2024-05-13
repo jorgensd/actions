@@ -63,7 +63,7 @@ runs:
       run: |
         MODERN_PIP=$(python3 -c "import sys; t = sys.version_info >= (3, 11, 0); sys.stdout.write(str(t))")
         if [ ${MODERN_PIP} == "True" ]; then
-          FLAGS="--break-system-packages"
+          FLAGS="--break-system-packages  --check-build-dependencies"
         else
           FLAGS=""
         fi
@@ -80,7 +80,7 @@ runs:
         cmake -G Ninja -B build-basix -DCMAKE_BUILD_TYPE="Release" -S ./basix/cpp/
         cmake --build build-basix --parallel 2
         cmake --install build-basix
-        python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --check-build-dependencies --config-settings=build-dir="build-basix-python" --config-settings=cmake.build-type=${{ inputs.build_mode }} --config-settings=install.strip=false --no-build-isolation ./basix/python
+        python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --config-settings=build-dir="build-basix-python" --config-settings=cmake.build-type=${{ inputs.build_mode }} --config-settings=install.strip=false --no-build-isolation ./basix/python
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}} git+https://github.com/FEniCS/ufl.git@${{ inputs.ufl }}
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}}s git+https://github.com/FEniCS/ffcx.git@${{ inputs.ffcx }}
 
@@ -110,4 +110,4 @@ runs:
     - name: Build Python interface (DOLFINx)
       working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
-      run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --check-build-dependencies --no-build-isolation  ./dolfinx/python/
+      run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --no-build-isolation  ./dolfinx/python/
