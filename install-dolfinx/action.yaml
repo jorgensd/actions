@@ -57,9 +57,21 @@ runs:
         repository: FEniCS/dolfinx
         ref: ${{ inputs.dolfinx }}
 
+    - name: Get pip flags based on version
+      id: python-version
+      run: |
+        PVERSION=$(python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)")
+        if [${PVERSION} == "3.11"] or [$PVERSION == "3.12"]
+        then
+          FLAGS="--break-system-packages"
+        else
+          FLAGS=""
+        fi
+        echo "PYTHON_FLAGS=${FLAGS}" >> "$GITHUB_OUTPUT"
+
     - name: Install pybind11
       shell: bash -el {0}
-      run: python3 -m pip install --break-system-packages pybind11
+      run: python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}} pybind11
 
     - name: Install UFL, Basix, FFCx
       working-directory: ${{ inputs.working-directory }}
@@ -68,9 +80,9 @@ runs:
         cmake -G Ninja -B build-basix -DCMAKE_BUILD_TYPE="Release" -S ./basix/cpp/
         cmake --build build-basix --parallel 2
         cmake --install build-basix
-        python3 -m pip -v install --break-system-packages --check-build-dependencies --config-settings=build-dir="build-basix-python" --config-settings=cmake.build-type=${{ inputs.build_mode }} --config-settings=install.strip=false --no-build-isolation ./basix/python
-        python3 -m pip install --break-system-packages git+https://github.com/FEniCS/ufl.git@${{ inputs.ufl }}
-        python3 -m pip install --break-system-packages git+https://github.com/FEniCS/ffcx.git@${{ inputs.ffcx }}
+        python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --check-build-dependencies --config-settings=build-dir="build-basix-python" --config-settings=cmake.build-type=${{ inputs.build_mode }} --config-settings=install.strip=false --no-build-isolation ./basix/python
+        python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}} git+https://github.com/FEniCS/ufl.git@${{ inputs.ufl }}
+        python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}}s git+https://github.com/FEniCS/ffcx.git@${{ inputs.ffcx }}
 
     - name: Install adios2
       if: ${{ inputs.adios2 != 'default' }}
@@ -98,4 +110,4 @@ runs:
     - name: Build Python interface (DOLFINx)
       working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
-      run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install --break-system-packages --check-build-dependencies --no-build-isolation  ./dolfinx/python/
+      run: PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS}} --check-build-dependencies --no-build-isolation  ./dolfinx/python/
