@@ -61,8 +61,8 @@ runs:
       id: python-version
       shell: bash -el {0}
       run: |
-        PVERSION=$(python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)")
-        if [ ${PVERSION} == "3.11" ] or [ $PVERSION == "3.12" ]; then
+        MODERN_PIP=$(import sys; t = sys.version_info >= (3, 11, 0) sys.stdout.write(str(t))")
+        if [ ${MODERN_PIP} == "True" ]; then
           FLAGS="--break-system-packages"
         else
           FLAGS=""
