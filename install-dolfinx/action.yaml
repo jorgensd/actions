@@ -61,7 +61,7 @@ runs:
       id: python-version
       shell: bash -el {0}
       run: |
-        MODERN_PIP=$(import sys; t = sys.version_info >= (3, 11, 0) sys.stdout.write(str(t))")
+        MODERN_PIP=$(python3 -c "import sys; t = sys.version_info >= (3, 11, 0); sys.stdout.write(str(t))")
         if [ ${MODERN_PIP} == "True" ]; then
           FLAGS="--break-system-packages"
         else
