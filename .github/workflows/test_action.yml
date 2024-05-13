@@ -29,9 +29,9 @@ jobs:
         adios2: [default, v2.10.0]
         container:
           [
-            docker.io/fenicsproject/test-env:current-redhat,
-            ghcr.io/fenics/test-env:current-openmpi,
-            ghcr.io/fenics/test-env:current-mpich,
+            "docker.io/fenicsproject/test-env:current-redhat",
+            "ghcr.io/fenics/test-env:current-openmpi",
+            "ghcr.io/fenics/test-env:current-mpich",
           ]
     container: ${{ matrix.container }}
 
