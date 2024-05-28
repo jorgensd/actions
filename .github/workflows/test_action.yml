@@ -45,10 +45,10 @@ jobs:
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-mpich"
-            branch: "v0.8.0"
+            branch: "release"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-openmpi"
-            branch: "v0.8.0"
+            branch: "release"
 
     container: ${{ matrix.image }}
     steps:
