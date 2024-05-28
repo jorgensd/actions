@@ -78,7 +78,7 @@ jobs:
       working-directory: ./src
     strategy:
       matrix:
-        branch: [main, release]
+        branch: [main]
         petsc_arch: [""]
         petsc_dir: ["/usr/local"]
         build_mode: [Release, Debug]
