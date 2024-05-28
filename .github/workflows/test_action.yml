@@ -26,13 +26,31 @@ jobs:
 
     strategy:
       matrix:
-        mpi: ["openmpi", "mpich"]
-        branch: [main, v0.8.0]
+        image:
+          [
+            "ghcr.io/fenics/dev-env:stable",
+            "ghcr.io/fenics/dev-env:v0.8.0-openmpi",
+            "ghcr.io/fenics/dev-env:current-mpich",
+            "ghcr.io/fenics/dev-env:current-openmpi",
+          ]
+        branch: [main, stable]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
         adios2: [default, v2.10.0]
+        exclude:
+          - image: "ghcr.io/fenics/dev-env:v0.8.0-openmpi"
+            branch: "main"
 
-    container: "ghcr.io/fenics/dev-env:${{ matrix.branch}} -${{ matrix.mpi }}"
+          - image: "ghcr.io/fenics/dev-env:v0.8.0-mpich"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dev-env:current-mpich"
+            branch: "v0.8.0"
+
+          - image: "ghcr.io/fenics/dev-env:current-openmpi"
+            branch: "v0.8.0"
+
+    container: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v4
 
