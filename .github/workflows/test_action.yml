@@ -27,12 +27,12 @@ jobs:
     strategy:
       matrix:
         mpi: ["openmpi", "mpich"]
-        branch: [main, release]
+        branch: [main, v0.8.0]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
         adios2: [default, v2.10.0]
 
-    container: "ghcr.io/fenics/test-env:current-${{ matrix.mpi }}"
+    container: "ghcr.io/fenics/dev-env:${{ matrix.branch}} -${{ matrix.mpi }}"
     steps:
       - uses: actions/checkout@v4
 

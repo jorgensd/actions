@@ -109,6 +109,5 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
       run: |
-        DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y libboost-filesystem-dev
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} -r ./dolfinx/python/build-requirements.txt
         PETSC_DIR=${{ inputs.petsc_dir }} PETSC_ARCH=${{ inputs.petsc_arch }} python3 -m pip -v install --check-build-dependencies ${{ steps.python-version.outputs.PYTHON_FLAGS }} --no-build-isolation  ./dolfinx/python/
