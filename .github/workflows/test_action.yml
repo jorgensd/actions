@@ -28,7 +28,7 @@ jobs:
       matrix:
         image:
           [
-            "ghcr.io/fenics/dolfinx/dev-env:stable",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:current-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:current-openmpi",
