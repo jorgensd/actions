@@ -70,10 +70,6 @@ runs:
         fi
         echo "PYTHON_FLAGS=${FLAGS}" >> "$GITHUB_OUTPUT"
 
-    - name: Install pybind11
-      shell: bash -el {0}
-      run: python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS}} pybind11
-
     - name: Install UFL, Basix, FFCx
       working-directory: ${{ inputs.working-directory }}
       shell: bash -el {0}
