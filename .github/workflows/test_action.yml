@@ -30,18 +30,26 @@ jobs:
           [
             "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-openmpi",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-mpich",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:current-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:current-openmpi",
           ]
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.0]
+        adios2: [default, v2.10.2]
         exclude:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-openmpi"
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.8.0-mpich"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich"
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-mpich"
