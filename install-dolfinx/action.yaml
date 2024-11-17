@@ -45,7 +45,9 @@ runs:
   steps:
     - name: Install libbost for backwards compatibility
       shell: bash -el {0}
-      run: apt-get install -y libboost-dev libboost-timer-dev
+      run: |
+        apt-get update
+        apt-get install -y libboost-dev libboost-timer-dev
 
     - name: Get Basix
       uses: actions/checkout@v4
