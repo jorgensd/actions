@@ -30,7 +30,6 @@ jobs:
           [
             "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi",
-            "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:current-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:current-openmpi",
@@ -41,9 +40,6 @@ jobs:
         adios2: [default, v2.10.2]
         exclude:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
-            branch: "main"
-
-          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich"
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi"

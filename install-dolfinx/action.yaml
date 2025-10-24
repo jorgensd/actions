@@ -121,7 +121,7 @@ runs:
         cmake --install build-dolfinx
 
     - name: Build Python interface (DOLFINx)
-      working-directory: ${{ inputs.working-directory }}/dolfinx.python
+      working-directory: ${{ inputs.working-directory }}/dolfinx/python
       shell: bash -el {0}
       run: |
         python3 -m pip install scikit-build-core
