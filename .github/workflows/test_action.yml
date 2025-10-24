@@ -5,8 +5,8 @@ on:
     branches:
       - main
   pull_request:
-    # branches:
-      # - main
+    branches:
+      - main
 
   workflow_call:
   workflow_dispatch:
@@ -28,6 +28,8 @@ jobs:
       matrix:
         image:
           [
+            "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:current-mpich",
@@ -42,6 +44,12 @@ jobs:
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich"
             branch: "main"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-mpich"
