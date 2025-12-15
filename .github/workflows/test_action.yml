@@ -37,7 +37,7 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.2]
+        adios2: [default, v2.10.2, v2.11.0]
         exclude:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
             branch: "main"
