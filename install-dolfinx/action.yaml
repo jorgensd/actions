@@ -111,8 +111,8 @@ runs:
       working-directory: ${{ inputs.working-directory }}/adios2
       shell: bash -el {0}
       run: |
-        git cherry-pick 305c7f2b748a541d8f3d055d56bc622834f59693
-        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S ./adios2
+        git cherry-pick dae5a6abb8d09a12cbc7e7af8d206f5c2a985e3b
+        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
 
