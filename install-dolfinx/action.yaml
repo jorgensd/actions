@@ -103,7 +103,7 @@ runs:
       uses: actions/checkout@v5
       with:
         path: ${{ inputs.working-directory }}/adios2
-        repository: https://github.com/ornladios/ADIOS2.git
+        repository: ornladios/ADIOS2
         ref: ${{ inputs.adios2 }}
 
     - name: Install adios2
