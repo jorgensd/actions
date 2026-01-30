@@ -105,7 +105,7 @@ runs:
         path: ${{ inputs.working-directory }}/adios2
         repository: ornladios/ADIOS2
         ref: ${{ inputs.adios2 }}
-        fetch_depth: 0 # Get all commits to apply patch
+        fetch-depth: 0 # Get all commits to apply patch
 
     - name: Install adios2
       if: ${{ inputs.adios2 != 'default' }}
