@@ -60,14 +60,14 @@ runs:
 
   steps:
     - name: Get Basix
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: ${{ inputs.working-directory }}/basix
         repository: ${{ inputs.basix-repository }}
         ref: ${{ inputs.basix }}
 
     - name: Get DOLFINx
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: ${{ inputs.working-directory }}/dolfinx
         repository: ${{ inputs.dolfinx-repository }}
@@ -98,13 +98,24 @@ runs:
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} git+https://github.com/${{ inputs.ufl-repository }}.git@${{ inputs.ufl }}
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} git+https://github.com/${{ inputs.ffcx-repository }}.git@${{ inputs.ffcx }}
 
+    - name: Clone ADIOS2
+      if: ${{ inputs.adios2 != 'default' }}
+      uses: actions/checkout@v5
+      with:
+        path: ${{ inputs.working-directory }}/adios2
+        repository: ornladios/ADIOS2
+        ref: ${{ inputs.adios2 }}
+        fetch-depth: 0 # Get all commits to apply patch
+
     - name: Install adios2
       if: ${{ inputs.adios2 != 'default' }}
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.working-directory }}/adios2
       shell: bash -el {0}
       run: |
-        git clone --branch=${{ inputs.adios2 }} --single-branch https://github.com/ornladios/ADIOS2.git adios2
-        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S ./adios2
+        git config --global user.email ""
+        git config --global user.name "Github Action Runner"
+        git cherry-pick dae5a6abb8d09a12cbc7e7af8d206f5c2a985e3b
+        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
 
