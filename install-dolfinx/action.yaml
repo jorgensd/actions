@@ -143,7 +143,7 @@ runs:
         PYTHON_SITE_DIR=$(python3 -c "import site; print(site.getsitepackages()[0])")
         echo "Installing Python bindings directly to: $PYTHON_SITE_DIR"
 
-        cmake -G Ninja -DADIOS2_USE_HDF5=on -DHDF5_PREFER_PARALLEL=on -DADIOS2_USE_Python=on -DCMAKE_INSTALL_PYTHONDIR="$PYTHON_SITE_DIR" -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
+        cmake -G Ninja -DADIOS2_USE_HDF5=on -DHDF5_PREFER_PARALLEL=on -DADIOS2_USE_Python=on -DCMAKE_INSTALL_PYTHONDIR="$PYTHON_SITE_DIR" -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
 
