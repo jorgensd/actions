@@ -98,9 +98,9 @@ jobs:
           try:
               # Check that ADIOS2 is built with MPI support
               def resolve_adios_scope(adios2):
-                  scope = adios2.bindings if hasattr(adios2, "bindings") else adios2
+                  scope = adios2.bindings if hasattr(adios2, 'bindings') else adios2
                   if not scope.is_built_with_mpi:
-                      raise ImportError("ADIOS2 must be built with MPI support")
+                      raise ImportError('ADIOS2 must be built with MPI support')
                   return scope
               adios2 = resolve_adios_scope(adios2)
               adios = adios2.ADIOS(MPI.COMM_WORLD)
