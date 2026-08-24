@@ -101,7 +101,10 @@ jobs:
 
       - name: Check ADIOS2 Python bindings for HDF5 MPI support
         run: |
-          mpirun -n 4 python3 -c "
+          export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+          PYTHON_SITE_DIR=$(python3 -c "import site; print(site.getsitepackages()[0])")
+          export PYTHONPATH=$PYTHON_SITE_DIR:$PYTHONPATH
+          mpirun -n 4 -x LD_LIBRARY_PATH -x PYTHONPATH python3 -c "
           import sys
           from mpi4py import MPI
 
