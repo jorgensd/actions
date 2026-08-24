@@ -135,7 +135,7 @@ runs:
           echo "Version ${{ inputs.adios2 }} is older than 2.13. Applying cherry-pick..."
           git config --global user.email ""
           git config --global user.name "Github Action Runner"
-          git cherry-pick ecf587ce8157bf66b82b8908b864d5e8eff39cda
+          git cherry-pick -m 1 ecf587ce8157bf66b82b8908b864d5e8eff39cda
         else
           echo "Version ${{ inputs.adios2 }} is newer than 2.13. Skipping cherry-pick."
         fi
