@@ -39,7 +39,7 @@ jobs:
         branch: [main, release]
         petsc_arch: [linux-gnu-real64-32, linux-gnu-complex128-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.2, v2.11.0, v2.12.1]
+        adios2: [default, v2.11.0, v2.12.1]
         exclude:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
             branch: "main"
@@ -82,3 +82,35 @@ jobs:
 
       - name: Check if DOLFINx runs in parallel
         run: mpirun -n 4 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
+
+      - name: Check ADIOS2 Python bindings for HDF5 MPI support
+        run: |
+          mpirun -n 4 python3 -c "
+          import sys
+          from mpi4py import MPI
+
+          try:
+              import adios2
+          except ImportError:
+              print('adios2 is not installed or not in PYTHONPATH')
+              sys.exit(1)
+              
+          try:
+              # 1. Test MPI support by passing the communicator
+              adios = adios2.ADIOS(MPI.COMM_WORLD)
+              
+              # 2. Test HDF5 support by initializing the HDF5 engine
+              io = adios.DeclareIO('hdf5_check')
+              io.SetEngine('HDF5')
+              
+              # Attempting to open a file actually triggers the engine instantiation.
+              # This will fail with a RuntimeError/ValueError if HDF5 is not compiled in.
+              engine = io.Open('test_hdf5_mpi.h5', adios2.Mode.Write)
+              engine.Close()
+              
+              if MPI.COMM_WORLD.rank == 0:
+                  print('ADIOS2 is successfully installed with HDF5 and MPI support.')
+          except Exception as e:
+              print(f'Rank {MPI.COMM_WORLD.rank} failed: {e}')
+              sys.exit(1)
+          "
