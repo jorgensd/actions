@@ -131,10 +131,22 @@ runs:
         else
           echo "Version ${{ inputs.adios2 }} is 2.12 or newer. Skipping cherry-pick."
         fi
-
+        if [ "$MAJOR" -lt 2 ] || { [ "$MAJOR" -eq 2 ] && [ "$MINOR" -lt 13 ]; }; then
+          echo "Version ${{ inputs.adios2 }} is older than 2.13. Applying cherry-pick..."
+          git config --global user.email ""
+          git config --global user.name "Github Action Runner"
+          git cherry-pick decf587ce8157bf66b82b8908b864d5e8eff39cda
+        else
+          echo "Version ${{ inputs.adios2 }} is newer than 2.13. Skipping cherry-pick."
+        fi
         cmake -G Ninja -DADIOS2_USE_HDF5=on -DHDF5_PREFER_PARALLEL=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
+
+    - name: Update PYTHONPATH
+      shell: bash -el {0}
+      run: |
+        echo "PYTHONPATH=/usr/local/lib/:$PYTHONPATH" >> $GITHUB_ENV
 
     - name: Configure C++ (DOLFINx)
       working-directory: ${{ inputs.working-directory }}
