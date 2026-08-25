@@ -1,13 +1,11 @@
 name: Test install-dolfinx action
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
-
   workflow_call:
   workflow_dispatch:
   schedule:
@@ -28,6 +26,10 @@ jobs:
       matrix:
         image:
           [
+            "ghcr.io/fenics/dolfinx/dev-env:current",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.11.0-openmpi",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.11.0-mpich",
+            "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich",
             "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi",
             "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi",
@@ -35,9 +37,9 @@ jobs:
             "ghcr.io/fenics/dolfinx/dev-env:current-openmpi",
           ]
         branch: [main, release]
-        petsc_arch: [linux-gnu-real64-32, linux-gnu-complex64-32]
+        petsc_arch: [linux-gnu-real64-32, linux-gnu-complex128-32]
         build_mode: [Release, Debug]
-        adios2: [default, v2.10.2, v2.11.0]
+        adios2: [default, v2.11.0, v2.12.1]
         exclude:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
             branch: "main"
@@ -48,15 +50,37 @@ jobs:
           - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich"
             branch: "main"
 
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.11.0-openmpi"
+            branch: "main"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.11.0-mpich"
+            branch: "main"
+
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-mpich"
             branch: "release"
 
           - image: "ghcr.io/fenics/dolfinx/dev-env:current-openmpi"
             branch: "release"
 
+          # Skip current dev-env as it doesn't have python bindings
+          - image: "ghcr.io/fenics/dolfinx/dev-env:current"
+            adios2: "default"
+          # Exclude older dev-envs
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-openmpi"
+            adios2: "default"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.9.0-mpich"
+            adios2: "default"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-openmpi"
+            adios2: "default"
+
+          - image: "ghcr.io/fenics/dolfinx/dev-env:v0.10.0-mpich"
+            adios2: "default"
+
     container: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./install-dolfinx
         with:
@@ -74,3 +98,44 @@ jobs:
 
       - name: Check if DOLFINx runs in parallel
         run: mpirun -n 4 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
+
+      - name: Check ADIOS2 Python bindings for HDF5 MPI support
+        run: |
+          export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+          PYTHON_SITE_DIR=$(python3 -c "import site; print(site.getsitepackages()[0])")
+          export PYTHONPATH=$PYTHON_SITE_DIR:$PYTHONPATH
+          mpirun -n 4 env LD_LIBRARY_PATH="$LD_LIBRARY_PATH" PYTHONPATH="$PYTHONPATH" python3 -c "
+          import sys
+          from mpi4py import MPI
+
+          try:
+              import adios2
+          except ImportError:
+              print('adios2 is not installed or not in PYTHONPATH')
+              sys.exit(1)
+              
+          try:
+              # Check that ADIOS2 is built with MPI support
+              def resolve_adios_scope(adios2):
+                  scope = adios2.bindings if hasattr(adios2, 'bindings') else adios2
+                  if not scope.is_built_with_mpi:
+                      raise ImportError('ADIOS2 must be built with MPI support')
+                  return scope
+              adios2 = resolve_adios_scope(adios2)
+              adios = adios2.ADIOS(MPI.COMM_WORLD)
+              
+              # Test HDF5 support by initializing the HDF5 engine
+              io = adios.DeclareIO('hdf5_check')
+              io.SetEngine('HDF5')
+              
+              # Attempting to open a file actually triggers the engine instantiation.
+              # This will fail with a RuntimeError/ValueError if HDF5 is not compiled in.
+              engine = io.Open('test_hdf5_mpi.h5', adios2.Mode.Write)
+              engine.Close()
+              
+              if MPI.COMM_WORLD.rank == 0:
+                  print('ADIOS2 is successfully installed with HDF5 and MPI support.')
+          except Exception as e:
+              print(f'Rank {MPI.COMM_WORLD.rank} failed: {e}')
+              sys.exit(1)
+          "

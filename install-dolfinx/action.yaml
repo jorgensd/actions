@@ -114,15 +114,15 @@ runs:
       run: |
         VERSION="${{ inputs.adios2 }}"
         VERSION="${VERSION#v}" # Strip 'v' prefix if present
-        
+
         # Extract major and minor version parts safely
         MAJOR=$(echo "$VERSION" | cut -d. -f1)
         MINOR=$(echo "$VERSION" | cut -d. -f2)
-        
+
         # Default to a high version number if the input isn't a numeric release (e.g., 'master')
         [[ "$MAJOR" =~ ^[0-9]+$ ]] || MAJOR=999
         [[ "$MINOR" =~ ^[0-9]+$ ]] || MINOR=999
-        
+
         if [ "$MAJOR" -lt 2 ] || { [ "$MAJOR" -eq 2 ] && [ "$MINOR" -lt 12 ]; }; then
           echo "Version ${{ inputs.adios2 }} is older than 2.12. Applying cherry-pick..."
           git config --global user.email ""
@@ -131,10 +131,22 @@ runs:
         else
           echo "Version ${{ inputs.adios2 }} is 2.12 or newer. Skipping cherry-pick."
         fi
-        
-        cmake -G Ninja -DADIOS2_USE_HDF5=on -DADIOS2_USE_Python=on -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_INSTALL_PYTHONDIR="/usr/local/lib"  -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
+        if [ "$MAJOR" -lt 2 ] || { [ "$MAJOR" -eq 2 ] && [ "$MINOR" -lt 13 ]; }; then
+          echo "Version ${{ inputs.adios2 }} is older than 2.13. Applying cherry-pick..."
+          git config --global user.email ""
+          git config --global user.name "Github Action Runner"
+          git cherry-pick -m 1 ecf587ce8157bf66b82b8908b864d5e8eff39cda
+        else
+          echo "Version ${{ inputs.adios2 }} is newer than 2.13. Skipping cherry-pick."
+        fi
+
+        PYTHON_SITE_DIR=$(python3 -c "import site; print(site.getsitepackages()[0])")
+        echo "Installing Python bindings directly to: $PYTHON_SITE_DIR"
+
+        cmake -G Ninja -DADIOS2_USE_HDF5=on -DHDF5_PREFER_PARALLEL=on -DADIOS2_USE_Python=on -DCMAKE_INSTALL_PYTHONDIR="$PYTHON_SITE_DIR" -DADIOS2_USE_Fortran=off -DBUILD_TESTING=off -DADIOS2_BUILD_EXAMPLES=off -DADIOS2_USE_ZeroMQ=off -DCMAKE_BUILD_TYPE="Release" -B build-dir-adios2 -S .
         cmake --build build-dir-adios2 --parallel 2
         cmake --install build-dir-adios2
+        ldconfig
 
     - name: Configure C++ (DOLFINx)
       working-directory: ${{ inputs.working-directory }}
