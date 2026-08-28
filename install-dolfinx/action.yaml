@@ -93,7 +93,7 @@ runs:
         cmake -G Ninja -B build-basix -DCMAKE_BUILD_TYPE="Release" -S ./basix/cpp/
         cmake --build build-basix --parallel 2
         cmake --install build-basix
-        python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} nanobind scikit-build-core[pyproject] mpi4py
+        python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} "nanobind<2.15" scikit-build-core[pyproject] mpi4py
         python3 -m pip -v install ${{ steps.python-version.outputs.PYTHON_FLAGS }} --check-build-dependencies --config-settings=build-dir="build-basix-python" --config-settings=cmake.build-type=${{ inputs.build_mode }} --config-settings=install.strip=false --no-build-isolation ./basix/python
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} git+https://github.com/${{ inputs.ufl-repository }}.git@${{ inputs.ufl }}
         python3 -m pip install ${{ steps.python-version.outputs.PYTHON_FLAGS }} git+https://github.com/${{ inputs.ffcx-repository }}.git@${{ inputs.ffcx }}
