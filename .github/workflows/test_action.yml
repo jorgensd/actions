@@ -98,7 +98,16 @@ jobs:
 
       - name: Check if DOLFINx runs in parallel
         run: mpirun -n 4 python3 -c "from mpi4py import MPI; import dolfinx; print(dolfinx.__version__)"
-
+      - name: Check compilation of simple form
+        run: |
+          python3 -c "
+          from mpi4py import MPI
+          import dolfinx
+          import ufl
+          mesh = dolfinx.mesh.create_unit_interval(MPI.COMM_WORLD, 10)
+          c = dolfinx.fem.Constant(mesh, dolfinx.default_scalar_type(1.0))
+          form = dolfinx.fem.form(c*ufl.dx(domain=mesh))
+          "
       - name: Check ADIOS2 Python bindings for HDF5 MPI support
         run: |
           export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
