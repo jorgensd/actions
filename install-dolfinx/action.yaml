@@ -96,7 +96,7 @@ runs:
     # building the stable bindings. Remove once the fix is in a release.
     - name: Constrain nanobind for stable DOLFINx
       shell: bash -el {0}
-      if: ${{ inputs.dolfinx == 'stable' }}
+      if: ${{ inputs.dolfinx == 'release' }}
       run: |
         echo "nanobind<2.14" > "$GITHUB_WORKSPACE/constraints.txt"
         echo "PIP_CONSTRAINT=$GITHUB_WORKSPACE/constraints.txt" >> $GITHUB_ENV
